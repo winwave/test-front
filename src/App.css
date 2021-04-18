@@ -1,6 +1,11 @@
+.app {
+  text-align: center;
+}
+
 .image {
   position: absolute;
   margin: auto;
+  top: 50px;
   right: 0;
   left: 0;
   width: 600px;
@@ -22,6 +27,8 @@ img {
   position: inherit;
   width: 100%;
   height: auto;
+  border: 5px solid #000000;
+
 }
 
 .btn-upload {
@@ -30,4 +37,29 @@ img {
   margin: auto;
   right: 0;
   left: 0;
+}
+
+button {
+  border: 1px solid #000;
+  height: 40px;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.upload-img {
+  background-color: #44b2c3;
+  color: #ffffff;
+  margin-right: 30px;
+}
+
+.btn-identify {
+  margin-right: 12px;
+}
+
+.desc-input {
+  height: 30px;
+  width: 200px;
+  margin-left: 12px;
 }

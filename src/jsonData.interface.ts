@@ -1,9 +1,9 @@
 import ReactCrop from 'react-image-crop';
-import { mapArea } from "./App";
+import { MapArea } from "./mapArea.interface";
 
 export interface JsonData {
   img: string;
-  mapArea: mapArea;
+  mapArea: MapArea;
   crop: ReactCrop.Crop;
   description: string
 }

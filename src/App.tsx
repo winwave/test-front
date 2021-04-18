@@ -4,7 +4,8 @@ import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 import './App.css';
-import {JsonData} from "./jsonData.interface";
+import { JsonData } from "./jsonData.interface";
+import { MapArea } from "./mapArea.interface";
 
 const cropDefault = ReactCrop.Crop = {
   unit: 'px',
@@ -14,15 +15,13 @@ const cropDefault = ReactCrop.Crop = {
   width: 50
 }
 
-const mapAreaDefault = {
-  name: 1,
+const mapAreaDefault : MapArea = {
+  name: "area",
   shape: "rect",
   coords: [0, 0, 0, 0],
   lineWidth: 2,
   preFillColor: "rgba(255, 255, 255, 0.3)"
 }
-
-export type mapArea = typeof mapAreaDefault
 
 function App() {
   const [tagged, setTagged] = useState<boolean>(true);
@@ -31,10 +30,10 @@ function App() {
   const [description, setDescription] = useState<string>('');
   const [img, setImg] = useState<string>('');
   const [crop, setCrop] = useState<ReactCrop.Crop>(cropDefault);
-  const [mapAreas, setMapAreas] = useState<Array<mapArea> | []>([]);
+  const [mapAreas, setMapAreas] = useState<Array<MapArea> | []>([]);
 
   useEffect(() =>{
-    setMapUpdated(true)
+    setMapUpdated(true);
   }, [mapAreas])
 
   const onImgChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,8 +41,9 @@ function App() {
       const reader: FileReader = new FileReader();
       reader.addEventListener('load', () => {
         setImg(reader.result as string);
-        setMapAreas([])
-        setCrop(cropDefault)
+        setMapUpdated(false);
+        setMapAreas([]);
+        setCrop(cropDefault);
       });
       reader.readAsDataURL(event.target.files[0]);
     }
@@ -54,13 +54,16 @@ function App() {
       const reader: FileReader = new FileReader();
       reader.readAsText(event.target.files[0], "UTF-8");
       reader.onload = (e : ProgressEvent<FileReader>) => {
-        // @ts-ignore
-        const result : JsonData = JSON.parse(e.target.result as string)
-        setImg(result.img);
-        setMapUpdated(false)
-        setMapAreas([result.mapArea]);
-        setCrop(result.crop);
-        setDescription(result.description);
+        if (e.target) {
+          const result : JsonData = JSON.parse(e.target.result as string)
+          setImg(result.img);
+          if (result.mapArea) {
+            setMapUpdated(false);
+            setMapAreas([result.mapArea]);
+            setCrop(result.crop);
+            setDescription(result.description);
+          }
+        }
       };
     }
   }
@@ -72,13 +75,6 @@ function App() {
     }
     setMapAreas([newArea])
     setTagged(!tagged)
-  }
-
-  const enterArea = (area) => {
-    setHoveredArea(area)
-  }
-  const leaveArea = (area) => {
-    setHoveredArea(null)
   }
 
   const getTooltipPosition = (area) => {
@@ -101,30 +97,35 @@ function App() {
   const ImageMapperComponent : ReactNode = useMemo(
     () => (
       <ImageMapper
+        data-test-id='ImageMapper'
         src={img}
         strokeColor="#6afd09"
         map={{
           name: 'map',
           areas: mapAreas,
-        }
-        }
-        onMouseEnter={area => enterArea(area)}
-        onMouseLeave={area => leaveArea(area)}
+        }}
+        onMouseEnter={area => setHoveredArea(area)}
+        onMouseLeave={() => setHoveredArea(null)}
       />
     ), [img, mapAreas]
   );
   return(
-    <div>
+    <div className='app'>
       <div className="image">
         {img &&
         <div>
           {!tagged &&
           <div>
-              <ReactCrop src={img} crop={crop} ruleOfThirds onChange={crop => setCrop(crop)} />
-              <label>
-                  Description
-                  <input type="text" onChange={event =>setDescription(event.target.value)} value={description}/>
-              </label>
+            <ReactCrop src={img} crop={crop} ruleOfThirds onChange={crop => setCrop(crop)} />
+            <label>
+              Description
+              <input
+                type="text"
+                onChange={event =>setDescription(event.target.value)}
+                value={description}
+                className="desc-input"
+              />
+            </label>
           </div>
           }
           { mapUpdated && tagged && ImageMapperComponent }
@@ -136,26 +137,26 @@ function App() {
               { description }
             </span>
           )}
-            <button onClick={() => saveMap()}>
+            <button onClick={() => saveMap()} className='btn-identify'>
               { tagged ? 'Identify' : 'Save' }
             </button>
           {
             tagged &&
             <button onClick={() => exportJson()}>
-                export to json
+              Export to json
             </button>
           }
         </div>
         }
       </div>
       <div className='btn-upload'>
-        <button>
-          <input type="file" accept="image/*" onChange={onImgChange} />
-          Select images
+        <button className="upload-img">
+          <input type="file" accept="image/*" onChange={onImgChange} alt="upload-img"/>
+          Select image
         </button>
-        <button>
-          <input type="file" accept="application/json" onChange={onJsonChange} />
-          Select Json file
+        <button className="upload-json">
+          <input type="file" accept="application/json" onChange={onJsonChange}  alt="upload-json"/>
+          Select Json Image file
         </button>
       </div>
     </div>
