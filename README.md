@@ -21,10 +21,17 @@ In this test I have use some Hooks's function like: `UseState` , `UseEffect` and
 
 
 - Feature we can do more: multi identified zones
+
+## Require
+
+Node version > 10
 ## Available Scripts
 
 In the project directory, you can run:
 
+### `yarn`
+
+Install all dependencies
 ### `yarn start`
 
 Runs the app in the development mode.\
