@@ -79,3 +79,31 @@ test('renders the right number of identified zone', async () => {
     expect(areas.length).toBe(2);
   });
 });
+
+
+test('renders crop to modify zone when click on the identified zone', async () => {
+  render(<App />);
+  const json = {
+    img: 'data:image/png;base64,KOKMkOKWoV/ilqEp',
+    mapAreas: [
+      {
+        name: 1,
+        shape:"rect",
+        coords:[182.5,148,468.5,340],
+        lineWidth: 2,
+        preFillColor: "rgba(255, 255, 255, 0.3)"
+      }
+    ]
+  };
+
+  await assertLoadJson(json);
+
+  await waitFor(() => {
+    const area = document.querySelector('area');
+    // @ts-ignore
+    fireEvent.click(area)
+
+    const crop =  document.getElementsByClassName('ReactCrop');
+    expect(crop).toBeTruthy()
+  });
+});
