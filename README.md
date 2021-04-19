@@ -5,7 +5,9 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Dependencies
 - [react-image-mapper](https://www.npmjs.com/package/react-image-mapper): React Component to highlight interactive zones in images
 - [react-image-crop](https://www.npmjs.com/package/react-image-crop): An image cropping tool for React, that is used for identify a zone in image
-
+ 
+---
+- [jest-canvas-mock](https://www.npmjs.com/package/jest-canvas-mock): Mock canvas for the test
 ## Architecture
 Typescript + [Hooks](https://reactjs.org/docs/hooks-intro.html)
 
