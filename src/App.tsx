@@ -16,7 +16,7 @@ const cropDefault = ReactCrop.Crop = {
 }
 
 const mapAreaDefault : MapArea = {
-  name: "area",
+  name: 0,
   shape: "rect",
   coords: [0, 0, 0, 0],
   lineWidth: 2,
@@ -27,7 +27,7 @@ function App() {
   const [tagged, setTagged] = useState<boolean>(true);
   const [mapUpdated, setMapUpdated] = useState<boolean>(true);
   const [hoveredArea, setHoveredArea] = useState<object | null>(null);
-  const [description, setDescription] = useState<string>('');
+  const [description, setDescription] = useState<string | undefined>('');
   const [img, setImg] = useState<string>('');
   const [crop, setCrop] = useState<ReactCrop.Crop>(cropDefault);
   const [mapAreas, setMapAreas] = useState<Array<MapArea> | []>([]);
@@ -57,11 +57,9 @@ function App() {
         if (e.target) {
           const result : JsonData = JSON.parse(e.target.result as string)
           setImg(result.img);
-          if (result.mapArea) {
+          if (result.mapAreas) {
             setMapUpdated(false);
-            setMapAreas([result.mapArea]);
-            setCrop(result.crop);
-            setDescription(result.description);
+            setMapAreas(result.mapAreas);
           }
         }
       };
@@ -71,10 +69,13 @@ function App() {
   const saveMap = () => {
     const newArea = {
       ...mapAreaDefault,
+      name: mapAreas.length ? mapAreas[mapAreas.length - 1].name +1 : 1,
+      description,
       coords: [crop.x, crop.y, crop.width+crop.x, crop.height + crop.y]
     }
-    setMapAreas([newArea])
-    setTagged(!tagged)
+    setCrop(cropDefault);
+    setMapAreas([...mapAreas, newArea])
+    setTagged(true)
   }
 
   const getTooltipPosition = (area) => {
@@ -84,14 +85,36 @@ function App() {
   const exportJson = () => {
     const json : JsonData = {
       img,
-      mapArea: mapAreas[0],
-      description,
-      crop
+      mapAreas: mapAreas
     };
     let a = document.createElement('a');
     a.href = "data:application/json,"+encodeURIComponent(JSON.stringify(json));
     a.download = 'image.json';
     a.click();
+  }
+
+  const onClickZone = (area: MapArea) => {
+    setCrop(ReactCrop.Crop={
+      unit: 'px',
+      x: area.coords[0],
+      y: area.coords[1],
+      width: area.coords[2] - area.coords[0],
+      height: area.coords[3] - area.coords[1]
+    })
+    setDescription(area.description);
+    setMapAreas(mapAreas.filter(obj => obj.name !== area.name));
+    setHoveredArea(null);
+    setTagged(false);
+  }
+
+  const mouseEnter = (area: MapArea) => {
+    setDescription(area.description);
+    setHoveredArea(area);
+  }
+
+  const identifyZone = () => {
+    setDescription('');
+    setTagged(false);
   }
 
   const ImageMapperComponent : ReactNode = useMemo(
@@ -104,8 +127,9 @@ function App() {
           name: 'map',
           areas: mapAreas,
         }}
-        onMouseEnter={area => setHoveredArea(area)}
+        onMouseEnter={area => mouseEnter(area)}
         onMouseLeave={() => setHoveredArea(null)}
+        onClick={area => onClickZone(area)}
       />
     ), [img, mapAreas]
   );
@@ -137,14 +161,20 @@ function App() {
               { description }
             </span>
           )}
-            <button onClick={() => saveMap()} className='btn-identify'>
-              { tagged ? 'Identify' : 'Save' }
-            </button>
+          {hoveredArea && <div className='tip'> click to modify the identified zone !</div>}
+          {!tagged && <button onClick={() => saveMap()} className='btn-identify'>
+              Save
+            </button>}
           {
             tagged &&
-            <button onClick={() => exportJson()}>
-              Export to json
-            </button>
+            <div>
+                <button onClick={() => identifyZone()} className='btn-identify'>
+                    Identify
+                </button>
+                <button onClick={() => exportJson()}>
+                    Export to json
+                </button>
+            </div>
           }
         </div>
         }

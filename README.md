@@ -15,12 +15,9 @@ In this test I have use some Hooks's function like: `UseState` , `UseEffect` and
 
 - Upload image
 - Upload json file contain: image (base64), identified zone coordinates, description (example: `src/image.json`)
-- Identify and modify zone
+- Identify and modify multi zone
 - Add description for the identified zone
 - export to json (example: `src/image.json`)
-
-
-- Feature we can do more: multi identified zones
 
 ## Require
 

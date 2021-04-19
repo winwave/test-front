@@ -1,7 +1,8 @@
 export interface MapArea {
-  name: string,
+  name: number,
   shape: string,
   coords: number[],
   lineWidth: number,
+  description?: string,
   preFillColor: string
 }
