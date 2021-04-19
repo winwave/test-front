@@ -6,27 +6,15 @@ import 'react-image-crop/dist/ReactCrop.css';
 import './App.css';
 import { JsonData } from "./jsonData.interface";
 import { MapArea } from "./mapArea.interface";
-
-const cropDefault = ReactCrop.Crop = {
-  unit: 'px',
-  x: 0,
-  y: 20,
-  height: 50,
-  width: 50
-}
-
-const mapAreaDefault : MapArea = {
-  name: 0,
-  shape: "rect",
-  coords: [0, 0, 0, 0],
-  lineWidth: 2,
-  preFillColor: "rgba(255, 255, 255, 0.3)"
-}
+import UploadButton from "./component/UploadButton/UploadButton";
+import Tooltip from "./component/Tooltip/Tooltip";
+import ZoneButton from "./component/ZoneButton/ZoneButton";
+import {cropDefault, mapAreaDefault} from "./store";
 
 function App() {
   const [tagged, setTagged] = useState<boolean>(true);
   const [mapUpdated, setMapUpdated] = useState<boolean>(true);
-  const [hoveredArea, setHoveredArea] = useState<object | null>(null);
+  const [hoveredArea, setHoveredArea] = useState<MapArea | null>(null);
   const [description, setDescription] = useState<string | undefined>('');
   const [img, setImg] = useState<string>('');
   const [crop, setCrop] = useState<ReactCrop.Crop>(cropDefault);
@@ -36,33 +24,18 @@ function App() {
     setMapUpdated(true);
   }, [mapAreas])
 
-  const onImgChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const reader: FileReader = new FileReader();
-      reader.addEventListener('load', () => {
-        setImg(reader.result as string);
-        setMapUpdated(false);
-        setMapAreas([]);
-        setCrop(cropDefault);
-      });
-      reader.readAsDataURL(event.target.files[0]);
-    }
+  const imageChange = (img: string) => {
+    setImg(img);
+    setMapUpdated(false);
+    setMapAreas([]);
+    setCrop(cropDefault);
   }
 
-  const onJsonChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const reader: FileReader = new FileReader();
-      reader.readAsText(event.target.files[0], "UTF-8");
-      reader.onload = (e : ProgressEvent<FileReader>) => {
-        if (e.target) {
-          const result : JsonData = JSON.parse(e.target.result as string)
-          setImg(result.img);
-          if (result.mapAreas) {
-            setMapUpdated(false);
-            setMapAreas(result.mapAreas);
-          }
-        }
-      };
+  const jsonChange = (result: JsonData) => {
+    setImg(result.img);
+    if (result.mapAreas) {
+      setMapUpdated(false);
+      setMapAreas(result.mapAreas);
     }
   }
 
@@ -76,21 +49,6 @@ function App() {
     setCrop(cropDefault);
     setMapAreas([...mapAreas, newArea])
     setTagged(true)
-  }
-
-  const getTooltipPosition = (area) => {
-    return { top: `${area.center[1]}px`, left: `${area.center[0]}px` };
-  }
-
-  const exportJson = () => {
-    const json : JsonData = {
-      img,
-      mapAreas: mapAreas
-    };
-    let a = document.createElement('a');
-    a.href = "data:application/json,"+encodeURIComponent(JSON.stringify(json));
-    a.download = 'image.json';
-    a.click();
   }
 
   const onClickZone = (area: MapArea) => {
@@ -133,6 +91,7 @@ function App() {
       />
     ), [img, mapAreas]
   );
+
   return(
     <div className='app'>
       <div className="image">
@@ -153,42 +112,14 @@ function App() {
           </div>
           }
           { mapUpdated && tagged && ImageMapperComponent }
-          { description && hoveredArea && (
-            <span
-              className="tooltip"
-              style={{ ...getTooltipPosition(hoveredArea) }}
-            >
-              { description }
-            </span>
-          )}
-          {hoveredArea && <div className='tip'> click to modify the identified zone !</div>}
-          {!tagged && <button onClick={() => saveMap()} className='btn-identify'>
-              Save
-            </button>}
-          {
-            tagged &&
-            <div>
-                <button onClick={() => identifyZone()} className='btn-identify'>
-                    Identify
-                </button>
-                <button onClick={() => exportJson()}>
-                    Export to json
-                </button>
-            </div>
-          }
+          { description && hoveredArea && (<Tooltip description={description} hoveredArea={hoveredArea} />)}
+          { hoveredArea && <div className='tip'> click to modify the identified zone !</div> }
+          { !tagged && <button onClick={() => saveMap()} className='btn-identify'>Save</button> }
+          { tagged && <ZoneButton identifyZone={() => identifyZone()} json={{img, mapAreas: mapAreas}} /> }
         </div>
         }
       </div>
-      <div className='btn-upload'>
-        <button className="upload-img">
-          <input type="file" accept="image/*" onChange={onImgChange} alt="upload-img"/>
-          Select image
-        </button>
-        <button className="upload-json">
-          <input type="file" accept="application/json" onChange={onJsonChange}  alt="upload-json"/>
-          Select Json Image file
-        </button>
-      </div>
+      <UploadButton imgChange={img => imageChange(img)} jsonChange={result => jsonChange(result)} />
     </div>
   )
 }
