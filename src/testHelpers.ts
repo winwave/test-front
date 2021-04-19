@@ -1,4 +1,5 @@
-import {act, fireEvent} from "@testing-library/react";
+import {act, fireEvent, screen} from "@testing-library/react";
+import {JsonData} from "./jsonData.interface";
 
 export const loadData = async (element: HTMLElement, blob: Blob | string, type: string) => await act(async () => {
   fireEvent.change(element, {
@@ -7,3 +8,13 @@ export const loadData = async (element: HTMLElement, blob: Blob | string, type: 
     },
   })
 })
+
+export const assertLoadJson = async (json?: JsonData) => {
+  const inputLoadImgElement = screen.getByAltText(/upload-json/i);
+  const jsonsData = json || {
+    img: 'data:image/png;base64,KOKMkOKWoV/ilqEp'
+  };
+  const blob = new Blob([JSON.stringify(jsonsData)], {type: "application/json"});
+
+  await loadData(inputLoadImgElement, blob, 'application/json')
+}
