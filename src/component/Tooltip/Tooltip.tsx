@@ -1,5 +1,5 @@
 import React from "react";
-import { MapArea } from "../../mapArea.interface";
+import { MapArea } from "../../model/mapArea.interface";
 
 function Tooltip({
   description,

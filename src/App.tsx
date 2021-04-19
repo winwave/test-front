@@ -4,8 +4,8 @@ import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 import './App.css';
-import { JsonData } from "./jsonData.interface";
-import { MapArea } from "./mapArea.interface";
+import { JsonData } from "./model/jsonData.interface";
+import { MapArea } from "./model/mapArea.interface";
 import UploadButton from "./component/UploadButton/UploadButton";
 import Tooltip from "./component/Tooltip/Tooltip";
 import ZoneButton from "./component/ZoneButton/ZoneButton";

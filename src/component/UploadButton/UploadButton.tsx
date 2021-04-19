@@ -1,4 +1,4 @@
-import {JsonData} from "../../jsonData.interface";
+import {JsonData} from "../../model/jsonData.interface";
 import React from "react";
 
 function UploadButton({

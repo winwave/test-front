@@ -1,5 +1,5 @@
 import React from "react";
-import {JsonData} from "../../jsonData.interface";
+import {JsonData} from "../../model/jsonData.interface";
 
 function ZoneButton({
   identifyZone,

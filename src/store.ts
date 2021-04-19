@@ -1,4 +1,4 @@
-import {MapArea} from "./mapArea.interface";
+import {MapArea} from "./model/mapArea.interface";
 import ReactCrop from 'react-image-crop';
 
 export const cropDefault = ReactCrop.Crop = {

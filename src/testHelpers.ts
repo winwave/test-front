@@ -1,5 +1,5 @@
 import {act, fireEvent, screen} from "@testing-library/react";
-import {JsonData} from "./jsonData.interface";
+import {JsonData} from "./model/jsonData.interface";
 
 export const loadData = async (element: HTMLElement, blob: Blob | string, type: string) => await act(async () => {
   fireEvent.change(element, {
